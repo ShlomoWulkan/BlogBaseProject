@@ -7,7 +7,7 @@ export interface IUser extends Document {
   email: string;
   profile: {
     bio?: string;
-    socialinks ?: string[];
+    socialLinks ?: string[];
   };
   posts: Types.ObjectId[];
 };
@@ -33,7 +33,7 @@ const UserSchema = new Schema<IUser>({
     bio: {
       type: String
     },
-    socialinks : {
+    socialLinks : {
       type: [String]
     },
   },

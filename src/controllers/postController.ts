@@ -35,6 +35,13 @@ export const deletePost = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
+  const post = await Post.findById(req.params.id);
+  if (!post) {
+    res.status(404).json({ message: "Post not found" });
+    return;
+  }
+  await Post.findByIdAndDelete(req.params.id);
+  res.status(200).json({ message: "Post deleted successfully" });
 
 };
 
@@ -78,6 +85,20 @@ export const updatePost = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
+  const post = await Post.findById(req.params.id);
+  if (!post) {
+    res.status(404).json({ message: "Post not found" });
+    return;
+  }
+
+  const { title, content } = req.body;
+  if (!title || !content) {
+    res.status(400).json({ message: "Please provide a title and content" });
+    return;
+  }
+
+  await Post.findByIdAndUpdate(req.params.id, { title, content });
+  res.status(200).json({ message: "Post updated successfully" });
 
 };
 
@@ -87,6 +108,20 @@ export const addComment = async (
   req: Request,
   res: Response,
   next: NextFunction
-): Promise<void> => {};
+): Promise<void> => {
+  const post = await Post.findById(req.params.id);
+  if (!post) {
+    res.status(404).json({ message: "Post not found" });
+    return;
+  }
+  const { comment } = req.body;
+  if (!comment) {
+    res.status(400).json({ message: "Please provide a comment" });
+    return;
+  }
+  post.comments.push(comment);
+  await post.save();
+  res.status(200).json({ message: "Comment added successfully" });
+};
 
 

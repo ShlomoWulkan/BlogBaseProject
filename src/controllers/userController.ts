@@ -23,21 +23,15 @@ export const createUser = async (
     email,
     profile: {
       bio: profile?.bio || "", 
-      socialinks : profile?.socialinks  || [] 
-    }
-  });
-
-    //todo: add social links
-    const socialinks  = user.profile.socialinks ;
-    user.profile.socialinks  = socialinks ;
-
+      socialLinks : profile?.socialLinks || [] 
+        }
+    });
     try {
         await user.save();
+        res.status(201).json({ message: "User created successfully" });
     } catch (error) {
         console.log(error);
     }
-
-    res.status(201).json({ message: "User created successfully" });
 };
 
 export const getUsers = async (
@@ -67,30 +61,37 @@ export const updateUser = async (
     req: Request,
     res: Response
     ) => {
-    const { username } = req.params;
-    const { profile } = req.body;
-    const user = await User.findOne({ username });
+    const user = await User.findOne({ _id: req.params.id });
     if (!user) {
         res.status(404).json({ message: "User not found" });
         return;
     }
 
+    const { username, email, profile } = req.body;
+    if (!username || !email) {
+        res.status(400).json({ message: "Please provide a username" });
+        return;
+    }
+
+    if (!validator.isEmail(email)) {
+        res.status(400).json({ message: "Invalid email format" });
+        return;
+    }
+
+    User.findByIdAndUpdate(req.params.id, { username, email, profile });
+    res.status(200).json({ message: "User updated successfully" });
 };
 
 export const deleteUser = async (
     req: Request, 
     res: Response
     ): Promise<void> => {
-    const { username } = req.params;
-    const user = await User.findOne({ username });
+    const user = await User.findOne({ _id: req.params.id });
     if (!user) {
         res.status(404).json({ message: "User not found" });
         return;
     }
-
-    await User.deleteOne({ username });
-
+    await User.findByIdAndDelete(req.params.id);
     res.status(200).json({ message: "User deleted successfully" });
 };
 
-// Optionally, add DELETE and EDIT functions
