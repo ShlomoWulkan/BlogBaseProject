@@ -4,6 +4,10 @@ import postRouter from "./routes/postRoutes";
 import userRouter from "./routes/userRoutes";
 import { errorHandler } from "./middleware/errorHandler";
 import connectDB from "./config/db";
+import { 
+  swaggerUi,
+  swaggerDocs
+ }  from "./swagger";
 
 dotenv.config();
 
@@ -16,6 +20,7 @@ app.use(express.json());
 connectDB();
 
 // Routes
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 app.use("/api/posts", postRouter);
 app.use("/api/users", userRouter);
 
